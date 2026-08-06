@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Native PDF Flipbook</title>
+  
+  <style>
+    body {
+      background-color: #2b2b2b;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+    }
+
+    #loading {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    #flipbook-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 90vw;
+      max-width: 1200px;
+      height: 85vh;
+    }
+
+    /* Page container styling */
+    .page-wrapper {
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">Rendering PDF Pages...</div>
+  <a href="index.html" id="back-btn" style="
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: background 0.2s;
+  " onmouseover="this.style.background='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">← Kembali</a>
+  <div id="flipbook-container">
+    <div id="book"></div>
+  </div>
+
+  <!-- 1. Include PDF.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  
+  <!-- 2. Include StPageFlip Library -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.js"></script>
+
+  <script>
+    // Define worker source for PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // Read PDF filename from URL parameter, fallback to default
+    const urlParams = new URLSearchParams(window.location.search);
+    const PDF_URL = urlParams.get('pdf') || 'document2.pdf'; 
+
+    async function renderPDFToFlipbook() {
+      const loadingEl = document.getElementById('loading');
+      const bookContainer = document.getElementById('book');
+
+      try {
+        // Load the PDF Document
+        const pdf = await pdfjsLib.getDocument(PDF_URL).promise;
+        const totalPages = pdf.numPages;
+
+        // Render each PDF page as an HTML canvas element
+        for (let i = 1; i <= totalPages; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: 1.5 });
+
+          // Create wrapper div for each page
+          const pageWrapper = document.createElement('div');
+          pageWrapper.className = 'page-wrapper';
+          
+          // Make cover pages hard-bound (optional)
+          if (i === 1 || i === totalPages) {
+            pageWrapper.setAttribute('data-density', 'hard');
+          }
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          await page.render({
+            canvasContext: context,
+            viewport: viewport
+          }).promise;
+
+          pageWrapper.appendChild(canvas);
+          bookContainer.appendChild(pageWrapper);
+        }
+
+        loadingEl.style.display = 'none';
+
+        // Initialize the PageFlip instance (two-page spread)
+        // Page proportion: 8.27 x 11.22 inches (A4)
+        const pageFlip = new St.PageFlip(bookContainer, {
+          width: 595,          // 8.27 inches at 72dpi
+          height: 808,         // 11.22 inches at 72dpi
+          size: 'stretch',     // Auto-scale to fill container
+          minWidth: 297,
+          maxWidth: 595,
+          minHeight: 404,
+          maxHeight: 808,
+          drawShadow: true,
+          showCover: true,
+          usePortrait: false   // Forces two-page spread display
+        });
+
+        // Load generated HTML elements into the flipbook
+        pageFlip.loadFromHTML(document.querySelectorAll('.page-wrapper'));
+
+      } catch (error) {
+        console.error(error);
+        loadingEl.innerText = 'Failed to load PDF. Check file path.';
+      }
+    }
+
+    renderPDFToFlipbook();
+  </script>
+</body>
+</html>

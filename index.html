@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buku Pedoman - Daftar Isi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #333;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      color: #fff;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: rgba(255,255,255,0.7);
+      font-size: 1rem;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f3460;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .toc-list {
+      list-style: none;
+    }
+
+    .toc-list li {
+      margin-bottom: 4px;
+    }
+
+    .toc-list a {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      text-decoration: none;
+      color: #333;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .toc-list a:hover {
+      background-color: #e8f0fe;
+      color: #0f3460;
+      transform: translateX(4px);
+    }
+
+    .toc-list a .number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      background: #0f3460;
+      color: #fff;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 14px;
+      flex-shrink: 0;
+    }
+
+    .toc-list a:hover .number {
+      background: #1a73e8;
+    }
+
+    .sub-item {
+      padding-left: 46px !important;
+      font-size: 0.9rem !important;
+      color: #555 !important;
+    }
+
+    .sub-item::before {
+      content: "•";
+      margin-right: 10px;
+      color: #999;
+    }
+
+    .no-link {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      color: #555;
+      font-size: 0.9rem;
+      padding-left: 46px;
+    }
+
+    .no-link::before {
+      content: "•";
+      margin-right: 10px;
+      color: #999;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 12px;
+      }
+      .section {
+        padding: 16px 18px;
+      }
+      header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📖 Buku Pedoman PPK 2026/2027</h1>
+      <p>Klik item untuk membuka dokumen dalam flipbook</p>
+    </header>
+
+    <!-- BAGIAN UMUM -->
+    <div class="section">
+      <div class="section-title">Bagian Umum</div>
+      <ul class="toc-list">
+        <li><a href="testing.html?pdf=01-daftar-isi.pdf"><span class="number">1</span> Daftar Isi</a></li>
+        <li><a href="testing.html?pdf=02-kata-pengantar.pdf"><span class="number">2</span> Kata Pengantar</a></li>
+        <li><a href="testing.html?pdf=03-sambutan-rektor.pdf"><span class="number">3</span> Sambutan Rektor UKWMS</a></li>
+        <li><a href="testing.html?pdf=04-lambang-universitas.pdf"><span class="number">4</span> Lambang Universitas</a></li>
+        <li><a href="testing.html?pdf=05-semboyan-bendera.pdf"><span class="number">5</span> Semboyan dan Bendera</a></li>
+        <li><a href="testing.html?pdf=06-hymne-widya-mandala.pdf"><span class="number">6</span> Hymne Widya Mandala</a></li>
+        <li><a href="testing.html?pdf=07-mars-ukwms.pdf"><span class="number">7</span> Mars UKWMS</a></li>
+        <li><a href="testing.html?pdf=08-tata-tertib-ppk.pdf"><span class="number">8</span> Tata Tertib PPK 2026/2027</a></li>
+        <li><a href="testing.html?pdf=09-susunan-acara.pdf"><span class="number">9</span> Susunan Acara PPK dan SBPT 2026/2027</a></li>
+      </ul>
+    </div>
+
+    <!-- GAMBARAN UMUM -->
+    <div class="section">
+      <div class="section-title">Gambaran Umum tentang UKWMS</div>
+      <ul class="toc-list">
+        <li><a href="testing.html?pdf=10-gambaran-umum.pdf"><span class="number">10</span> Gambaran Umum tentang UKWMS</a></li>
+        <li><span class="no-link">Sejarah Singkat UKWMS</span></li>
+        <li><span class="no-link">Visi, Misi, dan Nilai UKWMS</span></li>
+        <li><span class="no-link">Struktur Organisasi UKWMS</span></li>
+        <li><span class="no-link">Personalia Yayasan Widya Mandala Surabaya</span></li>
+        <li><span class="no-link">Pimpinan UKWMS (Surabaya &amp; Madiun)</span></li>
+        <li><span class="no-link">Pimpinan Unit Kerja UKWMS</span></li>
+      </ul>
+    </div>
+
+    <!-- PROGRAM STUDI -->
+    <div class="section">
+      <div class="section-title">Program Studi di Lingkungan UKWMS</div>
+      <ul class="toc-list">
+        <li><a href="testing.html?pdf=11-fkip.pdf"><span class="number">11</span> Fakultas Keguruan &amp; Ilmu Pendidikan</a></li>
+        <li><a href="testing.html?pdf=12-farmasi.pdf"><span class="number">12</span> Fakultas Farmasi</a></li>
+        <li><a href="testing.html?pdf=13-bisnis.pdf"><span class="number">13</span> Fakultas Bisnis</a></li>
+        <li><a href="testing.html?pdf=14-teknik.pdf"><span class="number">14</span> Fakultas Teknik</a></li>
+        <li><a href="testing.html?pdf=15-teknologi-pertanian.pdf"><span class="number">15</span> Fakultas Teknologi Pertanian</a></li>
+        <li><a href="testing.html?pdf=16-psikologi.pdf"><span class="number">16</span> Fakultas Psikologi</a></li>
+        <li><a href="testing.html?pdf=17-keperawatan.pdf"><span class="number">17</span> Fakultas Keperawatan</a></li>
+        <li><a href="testing.html?pdf=18-filsafat.pdf"><span class="number">18</span> Fakultas Filsafat</a></li>
+        <li><a href="testing.html?pdf=19-kedokteran.pdf"><span class="number">19</span> Fakultas Kedokteran</a></li>
+        <li><a href="testing.html?pdf=20-ilmu-komunikasi.pdf"><span class="number">20</span> Fakultas Ilmu Komunikasi</a></li>
+      </ul>
+    </div>
+
+    <!-- UNIT KERJA -->
+    <div class="section">
+      <div class="section-title">Unit Kerja di Lingkungan UKWMS</div>
+      <ul class="toc-list">
+        <li><a href="testing.html?pdf=21-hcm.pdf"><span class="number">21</span> Direktorat Human Capital Management (HCM)</a></li>
+        <li><a href="testing.html?pdf=22-kesekretariatan.pdf"><span class="number">22</span> Kesekretariatan Rektorat</a></li>
+        <li><a href="testing.html?pdf=23-upa.pdf"><span class="number">23</span> Unit Pengelola Aset (UPA)</a></li>
+        <li><a href="testing.html?pdf=24-baak.pdf"><span class="number">24</span> Biro Administrasi Akademik dan Kemahasiswaan (BAAK)</a></li>
+        <li><a href="testing.html?pdf=25-lkpa.pdf"><span class="number">25</span> Lembaga Kehumasan, Pemasaran dan Alumni (LKPA)</a></li>
+        <li><a href="testing.html?pdf=26-lppm.pdf"><span class="number">26</span> Lembaga Penelitian &amp; Pengabdian kepada Masyarakat (LPPM)</a></li>
+        <li><a href="testing.html?pdf=27-lpnu.pdf"><span class="number">27</span> Lembaga Penguatan Nilai Universitas (LPNU)</a></li>
+        <li><a href="testing.html?pdf=28-plp.pdf"><span class="number">28</span> Pusat Layanan Psikologi (PLP)</a></li>
+        <li><a href="testing.html?pdf=29-pdi.pdf"><span class="number">29</span> Pusat Data dan Informasi (PDI)</a></li>
+        <li><a href="testing.html?pdf=30-lsp.pdf"><span class="number">30</span> Lembaga Sertifikasi Profesi (LSP)</a></li>
+        <li><a href="testing.html?pdf=31-perpustakaan.pdf"><span class="number">31</span> Perpustakaan</a></li>
+        <li><a href="testing.html?pdf=32-campus-ministry.pdf"><span class="number">32</span> Campus Ministry</a></li>
+        <li><a href="testing.html?pdf=33-kpm.pdf"><span class="number">33</span> Kantor Penjaminan Mutu (KPM)</a></li>
+        <li><a href="testing.html?pdf=34-kui.pdf"><span class="number">34</span> Kantor Urusan Internasional (KUI)</a></li>
+        <li><a href="testing.html?pdf=35-ppkpt.pdf"><span class="number">35</span> Satgas PPKPT</a></li>
+        <li><a href="testing.html?pdf=36-ulk.pdf"><span class="number">36</span> Unit Layanan Konseling (ULK)</a></li>
+        <li><a href="testing.html?pdf=37-uld.pdf"><span class="number">37</span> Unit Layanan Disabilitas (ULD)</a></li>
+        <li><a href="testing.html?pdf=38-pedoman-disabilitas.pdf"><span class="number">38</span> Buku Pedoman Layanan Disabilitas</a></li>
+      </ul>
+    </div>
+
+    <!-- INFORMASI PENDUKUNG -->
+    <div class="section">
+      <div class="section-title">Informasi Pendukung</div>
+      <ul class="toc-list">
+        <li><a href="testing.html?pdf=39-informasi-pendukung.pdf"><span class="number">39</span> Informasi Pendukung</a></li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

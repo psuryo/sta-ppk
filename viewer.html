@@ -31,6 +31,43 @@
       width: 90vw;
       max-width: 1200px;
       height: 85vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #book-zoom-wrapper {
+      transition: transform 0.2s ease;
+      transform-origin: center center;
+    }
+
+    .zoom-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 1000;
+    }
+
+    .zoom-controls button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .zoom-controls button:hover {
+      background: #fff;
     }
 
     @media (max-width: 768px) {
@@ -72,7 +109,15 @@
     transition: background 0.2s;
   " onmouseover="this.style.background='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">← Kembali</a>
   <div id="flipbook-container">
-    <div id="book"></div>
+    <div id="book-zoom-wrapper">
+      <div id="book"></div>
+    </div>
+  </div>
+
+  <div class="zoom-controls">
+    <button id="zoom-in" title="Zoom In">+</button>
+    <button id="zoom-out" title="Zoom Out">−</button>
+    <button id="zoom-reset" title="Reset Zoom">⟲</button>
   </div>
 
   <!-- 1. Include PDF.js Library -->
@@ -168,6 +213,76 @@
     }
 
     renderPDFToFlipbook();
+
+    // Zoom functionality
+    let currentZoom = 1;
+    const zoomStep = 0.2;
+    const minZoom = 0.5;
+    const maxZoom = 3;
+    const zoomWrapper = document.getElementById('book-zoom-wrapper');
+
+    function applyZoom() {
+      zoomWrapper.style.transform = `scale(${currentZoom})`;
+    }
+
+    document.getElementById('zoom-in').addEventListener('click', () => {
+      if (currentZoom < maxZoom) {
+        currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+        applyZoom();
+      }
+    });
+
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      if (currentZoom > minZoom) {
+        currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+        applyZoom();
+      }
+    });
+
+    document.getElementById('zoom-reset').addEventListener('click', () => {
+      currentZoom = 1;
+      applyZoom();
+    });
+
+    // Mouse wheel zoom (Ctrl + scroll)
+    document.getElementById('flipbook-container').addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          currentZoom = Math.min(currentZoom + 0.1, maxZoom);
+        } else {
+          currentZoom = Math.max(currentZoom - 0.1, minZoom);
+        }
+        applyZoom();
+      }
+    }, { passive: false });
+
+    // Pinch-to-zoom for touch devices
+    let initialDistance = 0;
+    let initialZoom = 1;
+
+    document.getElementById('flipbook-container').addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        initialDistance = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        initialZoom = currentZoom;
+      }
+    });
+
+    document.getElementById('flipbook-container').addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const currentDistance = Math.hypot(
+          e.touches[0].pageX - e.touches[1].pageX,
+          e.touches[0].pageY - e.touches[1].pageY
+        );
+        const scale = currentDistance / initialDistance;
+        currentZoom = Math.min(Math.max(initialZoom * scale, minZoom), maxZoom);
+        applyZoom();
+      }
+    }, { passive: false });
   </script>
 </body>
 </html>

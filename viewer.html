@@ -33,6 +33,13 @@
       height: 85vh;
     }
 
+    @media (max-width: 768px) {
+      #flipbook-container {
+        width: 95vw;
+        height: 80vh;
+      }
+    }
+
     /* Page container styling */
     .page-wrapper {
       background-color: white;
@@ -121,8 +128,9 @@
 
         loadingEl.style.display = 'none';
 
-        // Initialize the PageFlip instance (two-page spread)
-        // Page proportion: 8.27 x 11.22 inches (A4)
+        // Responsive: single page on small screens, two-page spread on large screens
+        const isMobile = window.innerWidth <= 768;
+
         const pageFlip = new St.PageFlip(bookContainer, {
           width: 595,          // 8.27 inches at 72dpi
           height: 808,         // 11.22 inches at 72dpi
@@ -133,7 +141,21 @@
           maxHeight: 808,
           drawShadow: true,
           showCover: true,
-          usePortrait: false   // Forces two-page spread display
+          usePortrait: isMobile  // true = single page (mobile), false = two-page spread (desktop)
+        });
+
+        // Listen for window resize to switch between single/two-page mode
+        window.addEventListener('resize', () => {
+          const shouldBePortrait = window.innerWidth <= 768;
+          if (pageFlip.getOrientation() === 'portrait' && !shouldBePortrait) {
+            pageFlip.updateFromHtml(document.querySelectorAll('.page-wrapper'));
+            pageFlip.setting.usePortrait = false;
+            pageFlip.update();
+          } else if (pageFlip.getOrientation() === 'landscape' && shouldBePortrait) {
+            pageFlip.updateFromHtml(document.querySelectorAll('.page-wrapper'));
+            pageFlip.setting.usePortrait = true;
+            pageFlip.update();
+          }
         });
 
         // Load generated HTML elements into the flipbook

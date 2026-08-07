@@ -105,11 +105,121 @@
       height: 100%;
       display: block;
     }
+
+    /* Premium Error Page Styling */
+    #error-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      max-width: 480px;
+      width: 90%;
+      z-index: 100;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    #error-container .error-icon {
+      font-size: 4.5rem;
+      margin-bottom: 20px;
+      display: inline-block;
+      animation: pulseIcon 2s infinite ease-in-out;
+    }
+
+    #error-container h2 {
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    #error-container p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+      font-weight: 400;
+      margin-bottom: 30px;
+      line-height: 1.6;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #error-container .error-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #1a73e8 0%, #0f3460 100%);
+      color: #fff;
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #error-container .error-btn:hover {
+      background: linear-gradient(135deg, #1557b0 0%, #1a73e8 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(26, 115, 232, 0.6);
+    }
+
+    #error-container .error-btn:active {
+      transform: translateY(1px);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes pulseIcon {
+      0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0px rgba(255, 179, 0, 0));
+      }
+      50% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 15px rgba(255, 179, 0, 0.6));
+      }
+      100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0px rgba(255, 179, 0, 0));
+      }
+    }
   </style>
 </head>
 <body>
 
   <div id="loading">Rendering PDF Pages...</div>
+
+  <!-- Error Container for missing files -->
+  <div id="error-container">
+    <span class="error-icon">⚠️</span>
+    <h2>Pemberitahuan</h2>
+    <p>Maaf, data masih belum tersedia</p>
+    <a href="index.html" class="error-btn">
+      <span>←</span> Kembali ke Daftar Isi
+    </a>
+  </div>
+
   <a href="index.html" id="back-btn" style="
     position: fixed;
     top: 16px;
@@ -366,8 +476,28 @@
         pageFlip.loadFromHTML(document.querySelectorAll('.page-wrapper'));
 
       } catch (error) {
-        console.error(error);
-        loadingEl.innerText = 'Failed to load PDF. Check file path.';
+        console.error("Error loading PDF:", error);
+        
+        // Hide viewer elements
+        loadingEl.style.display = 'none';
+        
+        const flipbookContainer = document.getElementById('flipbook-container');
+        if (flipbookContainer) flipbookContainer.style.display = 'none';
+        
+        const zoomControls = document.querySelector('.zoom-controls');
+        if (zoomControls) zoomControls.style.display = 'none';
+        
+        const navControls = document.getElementById('nav-controls');
+        if (navControls) navControls.style.display = 'none';
+        
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) backBtn.style.display = 'none';
+        
+        // Show error container
+        const errorContainer = document.getElementById('error-container');
+        if (errorContainer) {
+          errorContainer.style.display = 'flex';
+        }
       }
     }
 
@@ -570,6 +700,12 @@
     // Update page indicator when flip happens (by any method)
     function attachFlipListener() {
       const checkInterval = setInterval(() => {
+        // If error-container is shown, clear interval to prevent running forever
+        const err = document.getElementById('error-container');
+        if (err && err.style.display === 'flex') {
+          clearInterval(checkInterval);
+          return;
+        }
         if (pageFlipInstance) {
           clearInterval(checkInterval);
           pageFlipInstance.on('flip', () => {

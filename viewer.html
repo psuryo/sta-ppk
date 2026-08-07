@@ -137,6 +137,41 @@
     <button id="zoom-reset" title="Reset Zoom">⟲</button>
   </div>
 
+  <!-- Page flip navigation buttons (visible in zoom mode) -->
+  <div id="nav-controls" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+    background: rgba(0,0,0,0.7);
+    padding: 8px 16px;
+    border-radius: 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  ">
+    <button id="prev-page" title="Previous Page" style="
+      width: 44px; height: 44px; border: none; border-radius: 50%;
+      background: rgba(255,255,255,0.9); color: #333; font-size: 1.4rem;
+      font-weight: bold; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    ">‹</button>
+    <span id="page-indicator" style="
+      color: #fff; font-size: 0.85rem; font-weight: 600; min-width: 80px;
+      text-align: center;
+    ">Page 1</span>
+    <button id="next-page" title="Next Page" style="
+      width: 44px; height: 44px; border: none; border-radius: 50%;
+      background: rgba(255,255,255,0.9); color: #333; font-size: 1.4rem;
+      font-weight: bold; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    ">›</button>
+  </div>
+
   <!-- 1. Include PDF.js Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   
@@ -257,7 +292,7 @@
           for (let i = 1; i <= totalPages; i++) {
             loadingEl.innerText = `Rendering page ${i} of ${totalPages}...`;
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.5 });
+            const viewport = page.getViewport({ scale: 2.0 });
 
             const pageWrapper = document.createElement('div');
             pageWrapper.className = 'page-wrapper';
@@ -298,13 +333,13 @@
         const isMobile = window.innerWidth <= 768;
 
         const pageFlip = new St.PageFlip(bookContainer, {
-          width: 700,
-          height: 950,
+          width: 800,
+          height: 1100,
           size: 'stretch',
-          minWidth: 350,
-          maxWidth: 1000,
-          minHeight: 500,
-          maxHeight: 1400,
+          minWidth: 400,
+          maxWidth: 1200,
+          minHeight: 550,
+          maxHeight: 1600,
           drawShadow: true,
           showCover: true,
           usePortrait: isMobile  // true = single page (mobile), false = two-page spread (desktop)
@@ -496,6 +531,55 @@
         applyZoom();
       }
     }, { passive: false });
+
+    // === Page Navigation Buttons ===
+    const pageIndicator = document.getElementById('page-indicator');
+
+    function updatePageIndicator() {
+      if (pageFlipInstance) {
+        const current = pageFlipInstance.getCurrentPageIndex() + 1;
+        const total = pageFlipInstance.getPageCount();
+        pageIndicator.textContent = `${current} / ${total}`;
+      }
+    }
+
+    document.getElementById('prev-page').addEventListener('click', () => {
+      if (pageFlipInstance) {
+        pageFlipInstance.flipPrev();
+        // Reset zoom when flipping
+        if (currentZoom > 1) {
+          currentZoom = 1;
+          applyZoom();
+        }
+        setTimeout(updatePageIndicator, 500);
+      }
+    });
+
+    document.getElementById('next-page').addEventListener('click', () => {
+      if (pageFlipInstance) {
+        pageFlipInstance.flipNext();
+        // Reset zoom when flipping
+        if (currentZoom > 1) {
+          currentZoom = 1;
+          applyZoom();
+        }
+        setTimeout(updatePageIndicator, 500);
+      }
+    });
+
+    // Update page indicator when flip happens (by any method)
+    function attachFlipListener() {
+      const checkInterval = setInterval(() => {
+        if (pageFlipInstance) {
+          clearInterval(checkInterval);
+          pageFlipInstance.on('flip', () => {
+            setTimeout(updatePageIndicator, 100);
+          });
+          updatePageIndicator();
+        }
+      }, 500);
+    }
+    attachFlipListener();
   </script>
 </body>
 </html>

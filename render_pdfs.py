@@ -35,7 +35,7 @@ def main():
     os.makedirs(output_base_dir, exist_ok=True)
     
     # Copy static web assets to dist/
-    static_assets = ["index.html", "viewer.html", "LogoWM.png"]
+    static_assets = ["index.html", "viewer.html", "LogoWM.png", "config.json"]
     for asset in static_assets:
         src = os.path.join(current_dir, asset)
         dst = os.path.join(dist_dir, asset)

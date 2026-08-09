@@ -423,8 +423,67 @@
       </ul>
     </div>
   </div>
+  <script>
+    // Fetch configuration and hide specified elements
+    async function applyConfig() {
+      try {
+        const response = await fetch('config.json');
+        if (!response.ok) {
+          console.warn('Could not load config.json, showing all items.');
+          return;
+        }
+        const config = await response.json();
+        const hiddenList = config.hidden;
+        if (!hiddenList || !Array.isArray(hiddenList)) return;
 
+        const listItems = document.querySelectorAll('.toc-list li');
+        listItems.forEach(li => {
+          if (shouldHide(li, hiddenList)) {
+            li.style.display = 'none';
+          }
+        });
+      } catch (err) {
+        console.warn('Error loading config.json:', err);
+      }
+    }
 
+    function shouldHide(li, hiddenList) {
+      // 1. Check href of anchors inside this item
+      const anchors = li.querySelectorAll('a');
+      for (const a of anchors) {
+        const href = a.getAttribute('href') || '';
+        for (const pattern of hiddenList) {
+          if (typeof pattern === 'string' && pattern.trim() !== '' && href.includes(pattern)) {
+            return true;
+          }
+        }
+      }
+
+      // 2. Check the item number if present
+      const numSpan = li.querySelector('.number');
+      if (numSpan) {
+        const numText = numSpan.textContent.trim();
+        for (const pattern of hiddenList) {
+          if ((typeof pattern === 'string' || typeof pattern === 'number') && String(pattern) === numText) {
+            return true;
+          }
+        }
+      }
+
+      // 3. Check the exact or partial text content of the element
+      const textContent = li.textContent.trim();
+      for (const pattern of hiddenList) {
+        if (typeof pattern === 'string' && pattern.trim() !== '' && textContent.includes(pattern.trim())) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // Run on load
+    applyConfig();
+  </script>
 </body>
 
 </html>

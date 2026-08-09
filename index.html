@@ -453,7 +453,7 @@
       for (const a of anchors) {
         const href = a.getAttribute('href') || '';
         for (const pattern of hiddenList) {
-          if (typeof pattern === 'string' && pattern.trim() !== '' && href.includes(pattern)) {
+          if (typeof pattern === 'string' && pattern.trim() !== '' && href.toLowerCase().includes(pattern.trim().toLowerCase())) {
             return true;
           }
         }
@@ -464,16 +464,17 @@
       if (numSpan) {
         const numText = numSpan.textContent.trim();
         for (const pattern of hiddenList) {
-          if ((typeof pattern === 'string' || typeof pattern === 'number') && String(pattern) === numText) {
+          if ((typeof pattern === 'string' || typeof pattern === 'number') && String(pattern).trim() === numText) {
             return true;
           }
         }
       }
 
       // 3. Check the exact or partial text content of the element
-      const textContent = li.textContent.trim();
+      // Normalize multiple consecutive whitespaces/newlines to a single space
+      const textContent = li.textContent.replace(/\s+/g, ' ').trim();
       for (const pattern of hiddenList) {
-        if (typeof pattern === 'string' && pattern.trim() !== '' && textContent.includes(pattern.trim())) {
+        if (typeof pattern === 'string' && pattern.trim() !== '' && textContent.toLowerCase().includes(pattern.trim().toLowerCase())) {
           return true;
         }
       }

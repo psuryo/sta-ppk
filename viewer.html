@@ -337,17 +337,13 @@
         // Responsive: single page on small screens, two-page spread on large screens
         const isMobile = window.innerWidth <= 768;
         const isLandscape = (pdfWidth / pdfHeight) > 1.15;
+        const ratio = pdfWidth / pdfHeight;
 
-        let bookWidth = pdfWidth;
-        let bookHeight = pdfHeight;
-        let minWidth = Math.round(pdfWidth / 2);
-        let maxWidth = pdfWidth * 1.5;
-        let minHeight = Math.round(pdfHeight / 2);
-        let maxHeight = pdfHeight * 1.5;
+        let bookWidth, bookHeight;
+        let minWidth, maxWidth, minHeight, maxHeight;
         let usePortrait = isMobile;
 
         if (isLandscape) {
-          const ratio = pdfWidth / pdfHeight;
           bookWidth = 1000;
           bookHeight = Math.round(1000 / ratio);
 
@@ -357,6 +353,15 @@
           maxHeight = Math.round(1920 / ratio);
 
           usePortrait = true; // Force single-page slideshow mode for wide documents
+        } else {
+          // Standard portrait book layout dimensions (in CSS pixels)
+          bookWidth = 800;
+          bookHeight = Math.round(800 / ratio);
+
+          minWidth = 400;
+          maxWidth = 1200;
+          minHeight = Math.round(400 / ratio);
+          maxHeight = Math.round(1200 / ratio);
         }
 
         const pageFlip = new St.PageFlip(bookContainer, {

@@ -365,10 +365,15 @@
         const cacheKey = PDF_URL;
         const cached = await getCachedPages(db, cacheKey);
 
+        let pdfWidth = 800;
+        let pdfHeight = 1100;
+
         if (cached && cached.pages && cached.pages.length > 0) {
           // === FAST PATH: Load from cache ===
           loadingEl.innerText = 'Loading from cache...';
           const totalPages = cached.pages.length;
+          pdfWidth = cached.pages[0].width || 800;
+          pdfHeight = cached.pages[0].height || 1100;
 
           for (let i = 0; i < totalPages; i++) {
             const pageData = cached.pages[i];
@@ -403,6 +408,11 @@
             loadingEl.innerText = `Rendering page ${i} of ${totalPages}...`;
             const page = await pdf.getPage(i);
             const viewport = page.getViewport({ scale: 2.0 });
+
+            if (i === 1) {
+              pdfWidth = viewport.width;
+              pdfHeight = viewport.height;
+            }
 
             const pageWrapper = document.createElement('div');
             pageWrapper.className = 'page-wrapper';
@@ -441,18 +451,40 @@
 
         // Responsive: single page on small screens, two-page spread on large screens
         const isMobile = window.innerWidth <= 768;
+        const isLandscape = (pdfWidth / pdfHeight) > 1.15;
+
+        let bookWidth = 800;
+        let bookHeight = 1100;
+        let minWidth = 400;
+        let maxWidth = 1200;
+        let minHeight = 550;
+        let maxHeight = 1600;
+        let usePortrait = isMobile;
+
+        if (isLandscape) {
+          const ratio = pdfWidth / pdfHeight;
+          bookWidth = 1000;
+          bookHeight = Math.round(1000 / ratio);
+
+          minWidth = 500;
+          maxWidth = 1920;
+          minHeight = Math.round(500 / ratio);
+          maxHeight = Math.round(1920 / ratio);
+
+          usePortrait = true; // Force single-page slideshow mode for wide documents
+        }
 
         const pageFlip = new St.PageFlip(bookContainer, {
-          width: 800,
-          height: 1100,
+          width: bookWidth,
+          height: bookHeight,
           size: 'stretch',
-          minWidth: 400,
-          maxWidth: 1200,
-          minHeight: 550,
-          maxHeight: 1600,
+          minWidth: minWidth,
+          maxWidth: maxWidth,
+          minHeight: minHeight,
+          maxHeight: maxHeight,
           drawShadow: true,
-          showCover: true,
-          usePortrait: isMobile  // true = single page (mobile), false = two-page spread (desktop)
+          showCover: !isLandscape, // Cover page behavior is less appropriate for slide-style views
+          usePortrait: usePortrait
         });
 
         // Store reference globally for zoom control
@@ -460,6 +492,7 @@
 
         // Listen for window resize to switch between single/two-page mode
         window.addEventListener('resize', () => {
+          if (isLandscape) return; // Keep single-page mode always for landscape documents
           const shouldBePortrait = window.innerWidth <= 768;
           if (pageFlip.getOrientation() === 'portrait' && !shouldBePortrait) {
             pageFlip.updateFromHtml(document.querySelectorAll('.page-wrapper'));

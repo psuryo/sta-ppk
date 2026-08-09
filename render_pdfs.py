@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import time
+import shutil
 
 def install_pymupdf_if_needed():
     try:
@@ -27,24 +28,39 @@ def main():
     fitz = install_pymupdf_if_needed()
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    output_base_dir = os.path.join(current_dir, "rendered")
+    dist_dir = os.path.join(current_dir, "dist")
+    output_base_dir = os.path.join(dist_dir, "rendered")
     
+    # Create dist and dist/rendered directories
     os.makedirs(output_base_dir, exist_ok=True)
     
-    # Scan for PDF files
+    # Copy static web assets to dist/
+    static_assets = ["index.html", "viewer.html", "LogoWM.png"]
+    for asset in static_assets:
+        src = os.path.join(current_dir, asset)
+        dst = os.path.join(dist_dir, asset)
+        if os.path.exists(src):
+            shutil.copy2(src, dst)
+            print(f"Copied static asset: {asset}")
+            
+    # Scan for PDF files in the root folder
     pdf_files = [f for f in os.listdir(current_dir) if f.lower().endswith(".pdf")]
     
     if not pdf_files:
-        print("No PDF files found in workspace.")
+        print("No PDF files found in workspace root.")
         return
         
-    print(f"Found {len(pdf_files)} PDF files. Compiling to static images...")
+    print(f"Found {len(pdf_files)} PDF files. Compiling to dist/...")
     
     for filename in sorted(pdf_files):
         pdf_path = os.path.join(current_dir, filename)
         pdf_basename = os.path.splitext(filename)[0]
         pdf_output_dir = os.path.join(output_base_dir, pdf_basename)
         manifest_path = os.path.join(pdf_output_dir, "manifest.json")
+        
+        # Copy the raw PDF to dist/ (so download links work)
+        dst_pdf = os.path.join(dist_dir, filename)
+        shutil.copy2(pdf_path, dst_pdf)
         
         # Skip rendering if already compiled and manifest is newer than PDF
         if os.path.exists(manifest_path):
@@ -93,7 +109,6 @@ def main():
                     "height": pix.height
                 })
                 
-                # Print progress inline
                 sys.stdout.write(f"\r  -> Rendered page {page_idx + 1}/{pages_count}")
                 sys.stdout.flush()
                 
@@ -105,7 +120,6 @@ def main():
                 "pages": pages_info
             }
             
-            manifest_path = os.path.join(pdf_output_dir, "manifest.json")
             with open(manifest_path, "w", encoding="utf-8") as f_manifest:
                 json.dump(manifest_data, f_manifest, indent=2)
                 

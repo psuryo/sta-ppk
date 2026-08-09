@@ -1,6 +1,4 @@
-rendered/
+dist/
 .wrangler/
 __pycache__/
 *.pyc
-*.pdf
-# (Optional: If you want to keep raw PDFs in Git, you can remove *.pdf from here)

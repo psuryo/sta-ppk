@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Native PDF Flipbook</title>
-  
+  <title>UKWMS Flipbook</title>
+
   <style>
     body {
       background-color: #2b2b2b;
@@ -71,12 +72,12 @@
       height: 40px;
       border: none;
       border-radius: 50%;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.9);
       color: #333;
       font-size: 1.2rem;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -97,7 +98,7 @@
     /* Page container styling */
     .page-wrapper {
       background-color: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
 
     canvas {
@@ -184,6 +185,7 @@
         opacity: 0;
         transform: scale(0.95) translateY(10px);
       }
+
       to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -195,10 +197,12 @@
         transform: scale(1);
         filter: drop-shadow(0 0 0px rgba(255, 179, 0, 0));
       }
+
       50% {
         transform: scale(1.08);
         filter: drop-shadow(0 0 15px rgba(255, 179, 0, 0.6));
       }
+
       100% {
         transform: scale(1);
         filter: drop-shadow(0 0 0px rgba(255, 179, 0, 0));
@@ -206,6 +210,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div id="loading">Loading pages...</div>
@@ -400,22 +405,22 @@
 
       } catch (error) {
         console.error("Error loading PDF:", error);
-        
+
         // Hide viewer elements
         loadingEl.style.display = 'none';
-        
+
         const flipbookContainer = document.getElementById('flipbook-container');
         if (flipbookContainer) flipbookContainer.style.display = 'none';
-        
+
         const zoomControls = document.querySelector('.zoom-controls');
         if (zoomControls) zoomControls.style.display = 'none';
-        
+
         const navControls = document.getElementById('nav-controls');
         if (navControls) navControls.style.display = 'none';
-        
+
         const backBtn = document.getElementById('back-btn');
         if (backBtn) backBtn.style.display = 'none';
-        
+
         // Show error container
         const errorContainer = document.getElementById('error-container');
         if (errorContainer) {
@@ -641,4 +646,5 @@
     attachFlipListener();
   </script>
 </body>
+
 </html>

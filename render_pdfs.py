@@ -35,7 +35,7 @@ def main():
     os.makedirs(output_base_dir, exist_ok=True)
     
     # Copy static web assets to dist/
-    static_assets = ["index.html", "viewer.html", "LogoWM.png", "config.json"]
+    static_assets = ["index.html", "viewer.html", "LogoWM.png", "config.json", "dampak.html"]
     for asset in static_assets:
         src = os.path.join(current_dir, asset)
         dst = os.path.join(dist_dir, asset)
@@ -50,6 +50,17 @@ def main():
         print("No PDF files found in workspace root.")
         return
         
+    # Read config.json to check which PDFs should not be downloadable
+    disable_download_list = []
+    try:
+        config_path = os.path.join(current_dir, "config.json")
+        if os.path.exists(config_path):
+            with open(config_path, "r", encoding="utf-8") as f_cfg:
+                config_data = json.load(f_cfg)
+                disable_download_list = config_data.get("disable_download", [])
+    except Exception as e:
+        print(f"Warning: Could not parse config.json for disabled downloads: {e}")
+
     print(f"Found {len(pdf_files)} PDF files. Compiling to dist/...")
     
     for filename in sorted(pdf_files):
@@ -58,9 +69,19 @@ def main():
         pdf_output_dir = os.path.join(output_base_dir, pdf_basename)
         manifest_path = os.path.join(pdf_output_dir, "manifest.json")
         
-        # Copy the raw PDF to dist/ (so download links work)
-        dst_pdf = os.path.join(dist_dir, filename)
-        shutil.copy2(pdf_path, dst_pdf)
+        # Copy the raw PDF to dist/ (if download is not disabled)
+        should_copy_pdf = True
+        for item in disable_download_list:
+            if item.lower() == filename.lower() or item.lower() == pdf_basename.lower():
+                should_copy_pdf = False
+                break
+                
+        if should_copy_pdf:
+            dst_pdf = os.path.join(dist_dir, filename)
+            shutil.copy2(pdf_path, dst_pdf)
+            print(f"Copied raw PDF: {filename}")
+        else:
+            print(f"Skipped copying raw PDF (downloads disabled): {filename}")
         
         # Skip rendering if already compiled and manifest is newer than PDF
         if os.path.exists(manifest_path):

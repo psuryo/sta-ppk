@@ -11,5 +11,8 @@
     "Susunan Acara PPK dan SBPT 2026/2027",
     "Gambaran Umum tentang UKWMS",
     "Buku Pedoman Layanan Disabilitas"
+  ],
+  "disable_download": [
+    "dampak.pdf"
   ]
 }

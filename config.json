@@ -4,5 +4,9 @@
   ],
   "disable_download": [
     "dampak.pdf"
-  ]
+  ],
+  "default_dpi": 150,
+  "dpi_overrides": {
+    "dampak.pdf": 300
+  }
 }

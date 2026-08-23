@@ -50,16 +50,20 @@ def main():
         print("No PDF files found in workspace root.")
         return
         
-    # Read config.json to check which PDFs should not be downloadable
+    # Read config.json to check settings (downloads, DPI, overrides)
     disable_download_list = []
+    default_dpi = 150
+    dpi_overrides = {}
     try:
         config_path = os.path.join(current_dir, "config.json")
         if os.path.exists(config_path):
             with open(config_path, "r", encoding="utf-8") as f_cfg:
                 config_data = json.load(f_cfg)
                 disable_download_list = config_data.get("disable_download", [])
+                default_dpi = config_data.get("default_dpi", 150)
+                dpi_overrides = config_data.get("dpi_overrides", {})
     except Exception as e:
-        print(f"Warning: Could not parse config.json for disabled downloads: {e}")
+        print(f"Warning: Could not parse config.json: {e}")
 
     print(f"Found {len(pdf_files)} PDF files. Compiling to dist/...")
     
@@ -69,6 +73,13 @@ def main():
         pdf_output_dir = os.path.join(output_base_dir, pdf_basename)
         manifest_path = os.path.join(pdf_output_dir, "manifest.json")
         
+        # Determine target DPI for this file
+        dpi = default_dpi
+        if filename in dpi_overrides:
+            dpi = dpi_overrides[filename]
+        elif pdf_basename in dpi_overrides:
+            dpi = dpi_overrides[pdf_basename]
+            
         # Copy the raw PDF to dist/ (if download is not disabled)
         should_copy_pdf = True
         for item in disable_download_list:
@@ -83,7 +94,7 @@ def main():
         else:
             print(f"Skipped copying raw PDF (downloads disabled): {filename}")
         
-        # Skip rendering if already compiled and manifest is newer than PDF
+        # Skip rendering if already compiled, manifest is newer than PDF, and DPI matches
         if os.path.exists(manifest_path):
             pdf_mtime = os.path.getmtime(pdf_path)
             manifest_mtime = os.path.getmtime(manifest_path)
@@ -92,14 +103,16 @@ def main():
                     with open(manifest_path, "r", encoding="utf-8") as f_mf:
                         m_data = json.load(f_mf)
                         pages_count = m_data.get("pagesCount", 0)
-                        all_exist = True
-                        for i in range(pages_count):
-                            if not os.path.exists(os.path.join(pdf_output_dir, f"page-{i + 1}.jpg")):
-                                all_exist = False
-                                break
-                        if all_exist:
-                            print(f"Skipping (already compiled): {filename}")
-                            continue
+                        manifest_dpi = m_data.get("dpi", 150) # Fallback to 150 if not specified
+                        if manifest_dpi == dpi:
+                            all_exist = True
+                            for i in range(pages_count):
+                                if not os.path.exists(os.path.join(pdf_output_dir, f"page-{i + 1}.jpg")):
+                                    all_exist = False
+                                    break
+                            if all_exist:
+                                print(f"Skipping (already compiled with same DPI {dpi}): {filename}")
+                                continue
                 except:
                     pass
         
@@ -116,8 +129,8 @@ def main():
             for page_idx in range(pages_count):
                 page = doc[page_idx]
                 
-                # Render to high quality image (DPI 150)
-                pix = page.get_pixmap(dpi=150)
+                # Render to high quality image with target DPI
+                pix = page.get_pixmap(dpi=dpi)
                 
                 img_name = f"page-{page_idx + 1}.jpg"
                 img_path = os.path.join(pdf_output_dir, img_name)
@@ -130,12 +143,13 @@ def main():
                     "height": pix.height
                 })
                 
-                sys.stdout.write(f"\r  -> Rendered page {page_idx + 1}/{pages_count}")
+                sys.stdout.write(f"\r  -> Rendered page {page_idx + 1}/{pages_count} at {dpi} DPI")
                 sys.stdout.flush()
                 
             # Write manifest.json
             manifest_data = {
                 "pagesCount": pages_count,
+                "dpi": dpi,
                 "width": pages_info[0]["width"] if pages_info else 0,
                 "height": pages_info[0]["height"] if pages_info else 0,
                 "pages": pages_info

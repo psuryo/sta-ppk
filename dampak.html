@@ -225,21 +225,6 @@
     </a>
   </div>
 
-  <a href="index.html" id="back-btn" style="
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    background: rgba(255,255,255,0.9);
-    color: #333;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    z-index: 1000;
-    transition: background 0.2s;
-  " onmouseover="this.style.background='#fff'" onmouseout="this.style.background='rgba(255,255,255,0.9)'">← Kembali</a>
   <div id="flipbook-container">
     <div id="book-zoom-wrapper">
       <div id="book"></div>
@@ -414,9 +399,6 @@
 
         const navControls = document.getElementById('nav-controls');
         if (navControls) navControls.style.display = 'none';
-
-        const backBtn = document.getElementById('back-btn');
-        if (backBtn) backBtn.style.display = 'none';
 
         // Show error container
         const errorContainer = document.getElementById('error-container');
